@@ -2,7 +2,7 @@
 
 ## Description
 
-A tool under Rust to parse ELF32/64 files.
+A tool under Rust for parsing ELF32/64 files.
 
 ## Usage
 
