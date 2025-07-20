@@ -1,3 +1,15 @@
+pub const SHF_WRITE: u64 = (1 << 0);
+pub const SHF_ALLOC: u64 = (1 << 1);
+pub const SHF_EXEC: u64 = (1 << 2);
+pub const SHF_MERGE: u64 = (1 << 4);
+pub const SHF_STRINGS: u64 = (1 << 5);
+pub const SHF_INFO_LINK: u64 = (1 << 6);
+pub const SHF_LINK_ORDER: u64 = (1 << 7);
+pub const SHF_OS_NONCONFORMING: u64 = (1 << 8);
+pub const SHF_GROUP: u64 = (1 << 9);
+pub const SHF_TLS: u64 = (1 << 10);
+pub const SHF_COMPRESSED: u64 = (1 << 11);
+
 #[derive(Debug, Clone, Copy)]
 pub struct Elf32Header {
     pub e_ident: [u8; 16],
@@ -249,6 +261,142 @@ impl SectionHeader {
                 0x70000001..=0x7FFFFFFF => "Processor spec",
                 _ => "Unknown",
             },
+        }
+    }
+
+    pub fn get_flags(&self) -> String {
+        match self {
+            SectionHeader::Elf32(sh) => {
+                let mut flags = Vec::new();
+                if sh.sh_flags & SHF_WRITE as u32 != 0 {
+                    flags.push("W");
+                }
+                if sh.sh_flags & SHF_ALLOC as u32 != 0 {
+                    flags.push("A");
+                }
+                if sh.sh_flags & SHF_EXEC as u32 != 0 {
+                    flags.push("X");
+                }
+                if sh.sh_flags & SHF_MERGE as u32 != 0 {
+                    flags.push("M");
+                }
+                if sh.sh_flags & SHF_STRINGS as u32 != 0 {
+                    flags.push("S");
+                }
+                if sh.sh_flags & SHF_INFO_LINK as u32 != 0 {
+                    flags.push("I");
+                }
+                if sh.sh_flags & SHF_LINK_ORDER as u32 != 0 {
+                    flags.push("L");
+                }
+                if sh.sh_flags & SHF_OS_NONCONFORMING as u32 != 0 {
+                    flags.push("O");
+                }
+                if sh.sh_flags & SHF_GROUP as u32 != 0 {
+                    flags.push("G");
+                }
+                if sh.sh_flags & SHF_TLS as u32 != 0 {
+                    flags.push("T");
+                }
+                if sh.sh_flags & SHF_COMPRESSED as u32 != 0 {
+                    flags.push("C");
+                }
+
+                // check processor flag
+                let processor_specific = (sh.sh_flags & 0x0FF00000) >> 20;
+                if processor_specific != 0 {
+                    flags.push("p");
+                }
+
+                // check unknown
+                let known_mask = SHF_WRITE
+                    | SHF_ALLOC
+                    | SHF_EXEC
+                    | SHF_MERGE
+                    | SHF_STRINGS
+                    | SHF_INFO_LINK
+                    | SHF_LINK_ORDER
+                    | SHF_OS_NONCONFORMING
+                    | SHF_GROUP
+                    | SHF_TLS
+                    | SHF_COMPRESSED
+                    | 0x0FF00000;
+
+                let unknown = sh.sh_flags & !known_mask as u32;
+                if unknown != 0 {
+                    flags.push("x");
+                }
+                if flags.is_empty() {
+                    return "-".to_string();
+                }
+
+                flags.join("")
+            }
+            SectionHeader::Elf64(sh) => {
+                let mut flags = Vec::new();
+                if sh.sh_flags & SHF_WRITE != 0 {
+                    flags.push("W");
+                }
+                if sh.sh_flags & SHF_ALLOC != 0 {
+                    flags.push("A");
+                }
+                if sh.sh_flags & SHF_EXEC != 0 {
+                    flags.push("X");
+                }
+                if sh.sh_flags & SHF_MERGE != 0 {
+                    flags.push("M");
+                }
+                if sh.sh_flags & SHF_STRINGS != 0 {
+                    flags.push("S");
+                }
+                if sh.sh_flags & SHF_INFO_LINK != 0 {
+                    flags.push("I");
+                }
+                if sh.sh_flags & SHF_LINK_ORDER != 0 {
+                    flags.push("L");
+                }
+                if sh.sh_flags & SHF_OS_NONCONFORMING != 0 {
+                    flags.push("O");
+                }
+                if sh.sh_flags & SHF_GROUP != 0 {
+                    flags.push("G");
+                }
+                if sh.sh_flags & SHF_TLS != 0 {
+                    flags.push("T");
+                }
+                if sh.sh_flags & SHF_COMPRESSED != 0 {
+                    flags.push("C");
+                }
+                // check processor flag
+                let processor_specific = (sh.sh_flags & 0x0FF00000) >> 20;
+                if processor_specific != 0 {
+                    flags.push("p");
+                }
+
+                // check unknown
+                let known_mask = SHF_WRITE
+                    | SHF_ALLOC
+                    | SHF_EXEC
+                    | SHF_MERGE
+                    | SHF_STRINGS
+                    | SHF_INFO_LINK
+                    | SHF_LINK_ORDER
+                    | SHF_OS_NONCONFORMING
+                    | SHF_GROUP
+                    | SHF_TLS
+                    | SHF_COMPRESSED
+                    | 0x0FF00000;
+
+                let unknown = sh.sh_flags & !known_mask;
+                if unknown != 0 {
+                    flags.push("x");
+                }
+                if flags.is_empty() {
+                    return "-".to_string();
+                }
+
+                flags.join("")
+            }
         }
     }
 }

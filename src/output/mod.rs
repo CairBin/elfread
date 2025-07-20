@@ -105,19 +105,19 @@ pub struct ProgramHeaderTable {
 pub struct ProgramHeaderTable2 {
     #[tabled(rename = "Index")]
     index: usize,
-    #[tabled(rename = "Virtual Address")]
+    #[tabled(rename = "Vir Address")]
     vaddr: String,
 
-    #[tabled(rename = "Physical Address")]
+    #[tabled(rename = "Phy Address")]
     paddr: String,
 
-    #[tabled(rename = "File Size")]
+    #[tabled(rename = "File Sz")]
     file_sz: String,
 
-    #[tabled(rename = "Memory Size")]
+    #[tabled(rename = "Memory Sz")]
     mem_sz: String,
 
-    #[tabled(rename = "Alignment")]
+    #[tabled(rename = "Align")]
     align: String,
 }
 
@@ -175,8 +175,10 @@ pub struct SectionHeaderTable {
     sh_type: String,
     #[tabled(rename = "Flags")]
     flags: String,
-    #[tabled(rename = "Address")]
-    addr: String,
+    #[tabled(rename = "Entry Sz")]
+    entsize: String,
+    #[tabled(rename = "Sz")]
+    size: String,
 }
 
 #[derive(Debug, Tabled)]
@@ -191,21 +193,12 @@ pub struct SectionHeaderTable2 {
     link: u32,
     #[tabled(rename = "Info")]
     info: u32,
-    #[tabled(rename = "AddrAlign")]
+    #[tabled(rename = "Align")]
     addralign: String,
+    #[tabled(rename = "Address")]
+    addr: String,
 }
 
-#[derive(Debug, Tabled)]
-pub struct SectionHeaderTable3 {
-    #[tabled(rename = "Index")]
-    index: usize,
-    #[tabled(rename = "Name")]
-    name: String,
-    #[tabled(rename = "EntSize")]
-    entsize: String,
-    #[tabled(rename = "Size")]
-    size: String,
-}
 
 impl SectionHeaderTable {
     pub fn from_sh(ndx: usize, sh: &SectionHeader, elf_file: &ElfFile) -> Self {
@@ -220,8 +213,9 @@ impl SectionHeaderTable {
                     index: ndx,
                     name: name,
                     sh_type: sh.get_type().to_string(),
-                    flags: sh.get_type().to_string(),
-                    addr: format!("0x{:016X}", s.sh_addr),
+                    flags: sh.get_flags().to_string(),
+                    entsize: format!("{}", s.sh_entsize),
+                    size: format!("{}", s.sh_size)
                     
                 }
             }
@@ -236,8 +230,9 @@ impl SectionHeaderTable {
                     index: ndx,
                     name: name,
                     sh_type: sh.get_type().to_string(),
-                    flags: sh.get_type().to_string(),
-                    addr: format!("0x{:016X}", s.sh_addr),
+                    flags: sh.get_flags().to_string(),
+                    entsize: format!("{}", s.sh_entsize),
+                    size: format!("{}", s.sh_size)
                 }
             }
         }
@@ -260,7 +255,8 @@ impl SectionHeaderTable2 {
                     offset: format!("0x{:016X}", s.sh_offset),
                     link: s.sh_link,
                     info: s.sh_info,
-                    addralign: format!("0x{:016X}", s.sh_addralign),
+                    addralign: format!("{}", s.sh_addralign),
+                    addr: format!("0x{:016X}", s.sh_addr),
                 }
             }
 
@@ -276,44 +272,11 @@ impl SectionHeaderTable2 {
                     offset: format!("0x{:016X}", s.sh_offset),
                     link: s.sh_link,
                     info: s.sh_info,
-                    addralign: format!("0x{:016X}", s.sh_addralign),
+                    addralign: format!("{}", s.sh_addralign),
+                    addr: format!("0x{:016X}", s.sh_addr),
                 }
             }
         }
     }
 }
 
-
-impl SectionHeaderTable3 {
-    pub fn from_sh(ndx: usize, sh: &SectionHeader, elf_file: &ElfFile) -> Self {
-        match sh {
-            SectionHeader::Elf32(s) => {
-                let name = match elf_file.get_section_name(ndx) {
-                    Some(n) => n,
-                    _ => String::new(),
-                };
-
-                Self {
-                    index: ndx,
-                    name: name,
-                    entsize: format!("0x{:016X}", s.sh_entsize),
-                    size: format!("0x{:016X}", s.sh_size),
-                }
-            }
-
-            SectionHeader::Elf64(s) => {
-                let name = match elf_file.get_section_name(ndx) {
-                    Some(n) => n,
-                    _ => String::new(),
-                };
-
-                Self {
-                    index: ndx,
-                    name: name,
-                    entsize: format!("0x{:016X}", s.sh_entsize),
-                    size: format!("0x{:016X}", s.sh_size),
-                }
-            }
-        }
-    }
-}

@@ -10,7 +10,7 @@ use std::path::PathBuf;
 use tabled::{Table, settings::Style};
 
 use crate::output::{
-    ProgramHeaderTable, ProgramHeaderTable2, SectionHeaderTable, SectionHeaderTable2, SectionHeaderTable3,
+    ProgramHeaderTable, ProgramHeaderTable2, SectionHeaderTable, SectionHeaderTable2
 };
 
 #[derive(Debug, Parser)]
@@ -18,13 +18,13 @@ use crate::output::{
 struct Usage {
     file: Option<PathBuf>,
 
-    #[arg(short, long, help="Print program header information")]
+    #[arg(short, long, help = "Print program header information")]
     program: bool,
 
-    #[arg(short, long, help="Print section header information")]
+    #[arg(short, long, help = "Print section header information")]
     section: bool,
 
-    #[arg(short, long, help="Print all information")]
+    #[arg(short, long, help = "Print all information")]
     all: bool,
 }
 
@@ -70,7 +70,10 @@ fn print_brief(elf_file: &ElfFile) {
 
 fn print_section(elf_file: &ElfFile) {
     if !elf_file.section_headers.is_empty() {
-        println!("\n{}", ">>>>>>>>>>> Section Header Tables <<<<<<<<<<<".green());
+        println!(
+            "\n{}",
+            ">>>>>>>>>>>>>>>>>>>>>>>>>>> Section Header Tables <<<<<<<<<<<<<<<<<<<<<<<<".green()
+        );
         let shs = elf_file
             .section_headers
             .iter()
@@ -81,33 +84,39 @@ fn print_section(elf_file: &ElfFile) {
             .iter()
             .enumerate()
             .map(|(i, sh)| SectionHeaderTable2::from_sh(i, &sh, &elf_file));
-
-        let shs3 = elf_file
-            .section_headers
-            .iter()
-            .enumerate()
-            .map(|(i, sh)| SectionHeaderTable3::from_sh(i, &sh, &elf_file));
         let mut sh_table = Table::new(shs);
         sh_table.with(Style::modern());
 
         let mut sh_table2 = Table::new(shs2);
         sh_table2.with(Style::modern());
 
-        let mut sh_table3 = Table::new(shs3);
-        sh_table3.with(Style::modern());
-        
+
         println!("\n{}", "Section Header Info Table1:".green());
         println!("{}", sh_table);
+        /*
+            Key to Flags:
+            W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+            L (link order), O (extra OS processing required), G (group), T (TLS),
+            C (compressed), x (unknown), o (OS specific), E (exclude),
+            D (mbind), p (processor specific)
+        */
+        println!("Key to Flags:");
+        println!("  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),");
+        println!("  L (link order), O (extra OS processing required), G (group), T (TLS),");
+        println!("  C (compressed), x (unknown), o (OS specific), E (exclude),");
+        println!("  D (mbind), p (processor specific), - (empty)");
+
         println!("\n{}", "Section Header Info Table2:".green());
         println!("{}", sh_table2);
-        println!("\n{}", "Section Header Info Table3:".green());
-        println!("{}", sh_table3);
     }
 }
 
 fn print_program(elf_file: &ElfFile) {
     if !elf_file.program_headers.is_empty() {
-        println!("\n{}", ">>>>>>>>>>> Program Header Tables <<<<<<<<<<<".green());
+        println!(
+            "\n{}",
+            ">>>>>>>>>>> Program Header Tables <<<<<<<<<<<".green()
+        );
         let phs = elf_file
             .program_headers
             .iter()
@@ -126,7 +135,7 @@ fn print_program(elf_file: &ElfFile) {
 
         println!("\n{}", "Program Header Info Table1:".green());
         println!("{}", ph_table);
-
+        
         println!("\n{}", "Program Header Info Table2:".green());
         println!("{}", ph_table2);
     }
