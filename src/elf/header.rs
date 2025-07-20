@@ -10,6 +10,10 @@ pub const SHF_GROUP: u64 = (1 << 9);
 pub const SHF_TLS: u64 = (1 << 10);
 pub const SHF_COMPRESSED: u64 = (1 << 11);
 
+pub const PF_X:u32 = (1 << 0);
+pub const PF_W:u32 = (1 << 1);
+pub const PF_R:u32 = (1 << 2);
+
 #[derive(Debug, Clone, Copy)]
 pub struct Elf32Header {
     pub e_ident: [u8; 16],
@@ -138,7 +142,7 @@ impl ProgramHeader {
                 0x60000000 => "LOOS",
                 0x60000001..=0x6FFFFFFF => "OS spec",
                 0x70000000 => "LOPROC",
-                0x70000001..=0x7FFFFFFF => "Processor spec)",
+                0x70000001..=0x7FFFFFFF => "Pr spec)",
                 _ => "Unknown",
             },
 
@@ -155,7 +159,7 @@ impl ProgramHeader {
                 0x60000000 => "LOOS",
                 0x60000001..=0x6FFFFFFF => "OS spec",
                 0x70000000 => "LOPROC",
-                0x70000001..=0x7FFFFFFF => "Processor spec)",
+                0x70000001..=0x7FFFFFFF => "Pr spec)",
                 _ => "Unknown",
             },
         }
@@ -165,40 +169,28 @@ impl ProgramHeader {
         match self {
             ProgramHeader::Elf32(ph) => {
                 let mut flags = String::new();
-                if ph.p_flags & 0x1 != 0 {
+                if ph.p_flags & PF_X != 0{
                     flags.push('X');
-                } else {
-                    flags.push('-');
                 }
-                if ph.p_flags & 0x2 != 0 {
+                if ph.p_flags & PF_W != 0{
                     flags.push('W');
-                } else {
-                    flags.push('-');
                 }
-                if ph.p_flags & 0x4 != 0 {
+                if ph.p_flags & PF_R != 0{
                     flags.push('R');
-                } else {
-                    flags.push('-');
                 }
                 flags
             }
 
             ProgramHeader::Elf64(ph) => {
                 let mut flags = String::new();
-                if ph.p_flags & 0x1 != 0 {
+                if ph.p_flags & PF_X != 0{
                     flags.push('X');
-                } else {
-                    flags.push('-');
                 }
-                if ph.p_flags & 0x2 != 0 {
+                if ph.p_flags & PF_W != 0{
                     flags.push('W');
-                } else {
-                    flags.push('-');
                 }
-                if ph.p_flags & 0x4 != 0 {
+                if ph.p_flags & PF_R != 0{
                     flags.push('R');
-                } else {
-                    flags.push('-');
                 }
                 flags
             }
@@ -232,7 +224,7 @@ impl SectionHeader {
                 0x60000000 => "LOOS",
                 0x60000001..=0x6FFFFFFF => "OS spec",
                 0x70000000 => "LOPROC",
-                0x70000001..=0x7FFFFFFF => "Processor spec",
+                0x70000001..=0x7FFFFFFF => "Pr spec",
                 _ => "Unknown",
             },
             SectionHeader::Elf64(sh) => match sh.sh_type {
@@ -258,7 +250,7 @@ impl SectionHeader {
                 0x60000000 => "LOOS",
                 0x60000001..=0x6FFFFFFF => "OS spec",
                 0x70000000 => "LOPROC",
-                0x70000001..=0x7FFFFFFF => "Processor spec",
+                0x70000001..=0x7FFFFFFF => "Pr spec",
                 _ => "Unknown",
             },
         }

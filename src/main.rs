@@ -4,6 +4,8 @@ mod output;
 use clap::Parser;
 use elf::ElfFile;
 use owo_colors::OwoColorize;
+use tabled::settings::object::{Columns, Rows};
+use tabled::settings::{Alignment, Border, Margin, Modify, Padding, Width};
 use std::fs;
 use std::io::{BufReader, Read};
 use std::path::PathBuf;
@@ -85,10 +87,14 @@ fn print_section(elf_file: &ElfFile) {
             .enumerate()
             .map(|(i, sh)| SectionHeaderTable2::from_sh(i, &sh, &elf_file));
         let mut sh_table = Table::new(shs);
-        sh_table.with(Style::modern());
-
+        sh_table.with(Style::ascii());
+        sh_table.with(Padding::new(0, 1, 0, 0));
+        sh_table.with(Margin::new(0, 0, 1, 1));
+        sh_table.with(Modify::new(Columns::new(2..=8)).with(Alignment::right()));
         let mut sh_table2 = Table::new(shs2);
-        sh_table2.with(Style::modern());
+        sh_table2.with(Style::ascii());
+        sh_table2.with(Padding::new(0, 1, 0, 0));
+        sh_table2.with(Margin::new(0, 0, 1, 1));
 
 
         println!("\n{}", "Section Header Info Table1:".green());
@@ -128,10 +134,14 @@ fn print_program(elf_file: &ElfFile) {
             .enumerate()
             .map(|(i, ph)| ProgramHeaderTable2::from_ph(i, &ph));
         let mut ph_table = Table::new(phs);
-        ph_table.with(Style::modern());
+        ph_table.with(Style::ascii());
+        ph_table.with(Padding::new(0, 1, 0, 0));
+        ph_table.with(Margin::new(0, 0, 1, 1));
 
         let mut ph_table2 = Table::new(phs2);
-        ph_table2.with(Style::modern());
+        ph_table2.with(Style::ascii());
+        ph_table2.with(Padding::new(0, 1, 0, 0));
+        ph_table2.with(Margin::new(0, 0, 1, 1));
 
         println!("\n{}", "Program Header Info Table1:".green());
         println!("{}", ph_table);
